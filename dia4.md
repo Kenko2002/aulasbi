@@ -1,319 +1,265 @@
-O erro exibido no seu leitor ocorreu porque o caractere de moeda `$` colidiu com o delimitador matemático do LaTeX (o leitor interpretou o `$` de "R$" como fechamento antecipado da fórmula, gerando o erro de *Missing close brace*). Toda a notação matemática foi convertida para blocos de código e texto limpo, eliminando qualquer falha de compilação em qualquer leitor de Markdown.
-
-Abaixo está o planejamento reestruturado (com a **Sessão 4.5 dedicada a `SUMX` e `AVERAGEX`**), a **Colinha Técnica Completa** (incluindo `IF`, `SWITCH`, operadores e iteradores) e o **Caderno de Prática** discriminando a qual sessão do livro-texto cada atividade pertence, utilizando exclusivamente o dataset da planta.
-
----
-
-# PLANEJAMENTO DO DIA (ATUALIZADO)
-
-* **08:00 – 08:45 | Bloco 1:** O Motor Analítico do DAX e a Pergunta da PF-01 (Propagação de Filtro e Modelo Estrela).
-* **08:45 – 09:30 | Bloco 2:** Colunas Calculadas vs. Medidas e Agregações Básicas (`SUM`, `AVERAGE`, `COUNTROWS`).
-* **09:45 – 10:30 | Bloco 3:** Funções Lógicas de Negócio no PCM (`IF`, `SWITCH` e `SWITCH(TRUE())`).
-* **10:30 – 11:15 | Bloco 4 (Sessão 4.5):** O Mecanismo dos Iteradores — Entendendo `SUMX` e `AVERAGEX` Passo a Passo.
-* **11:15 – 12:00 | Bloco 5:** Divisão Segura (`DIVIDE`), Boas Práticas e *Measure Branching*.
-* **13:00 – 15:30 | Laboratório Prático:** Caderno de Exercícios Hands-on com o Dataset da Planta.
+O planejamento anterior apresentava duas desconexões importantes que foram corrigidas nesta versão:
+1. **Numeração das seções do livro:** As referências antigas citavam capítulos inexistentes (Capítulos 7, 8 e 12 em inglês). O seu livro-texto (*Power BI e DAX para Manutenção*) organiza todos esses temas exatamente no **Capítulo 4 (Seções 4.1 a 4.7)**. Todas as atividades e blocos agora trazem a seção exata da apostila.
+2. **Alinhamento com o Dataset Real anexado:** A base enviada possui **350 ordens de serviço** (`51020` a `51869`) e **20 equipamentos** (`BR-01`, `MO-01`, `FO-01`, `TR-02`, etc.), com as colunas exatas `Custo (R$)`, `Horas Paradas`, `Horas Previstas` e `Valor Hora Parada (R$)`. Todo o laboratório prático e o gabarito de conferência da tarde foram recalculados com os números reais do seu arquivo para que os alunos vejam na tela exatamente os mesmos valores da sua apostila de aula.
 
 ---
 
-# 1. ENTENDENDO O FUNCIONAMENTO DE `SUMX` E `AVERAGEX` (SESSÃO 4.5)
+# CRONOGRAMA DE AULA — CAPÍTULO 4: FUNDAMENTOS DA LINGUAGEM DAX
 
-### Por que `SUM` não resolve tudo?
-A função `SUM(Tabela[Coluna])` é um agregador simples: ela olha para uma coluna existente e soma todos os números visíveis no filtro atual. 
-Contudo, no mundo real da manutenção, muitas vezes o dado que você precisa calcular **não existe em uma coluna pronta**.
+## TURNO DA MANHÃ (08:00 às 12:00) — Teoria Aplicada e Demonstrações Guiadas
 
-### O que faz um Iterador (Funções "X")?
-Os iteradores executam um processo em duas etapas:
-1. **Passo 1 (Linha a linha):** Percorrem a tabela especificada, linha por linha, avaliando uma expressão matemática para cada registro (criando um valor temporário em memória).
-2. **Passo 2 (Agregação final):** No final da varredura, consolidam todos os resultados parciais usando a operação base (`SUMX` soma tudo; `AVERAGEX` calcula a média aritmética).
+| Horário | Bloco / Tópico de Aula | Seção do Livro | Atividade em Sala (Exemplos do Livro + Dataset Real) |
+| :--- | :--- | :---: | :--- |
+| **08:00 – 08:40** | **Bloco 1:** Modelo de Dados Visto pelo DAX | **Seção 4.1** (p. 87–90) | Conferência da Exibição de Modelo: tabelas dimensão (`Equipamentos` e `Calendário`) filtrando a tabela fato (`OS`) no sentido `1:*`. Demonstração prática filtrando a área **Concentração** (`SM-01` e `SM-02`) na segmentação. |
+| **08:40 – 09:20** | **Bloco 2:** Colunas Calculadas vs. Medidas | **Seção 4.2** (p. 90–92) | O dilema da Perfuratriz `PF-01` do livro (média das médias vs. razão das somas). Criação da tabela vazia `Medidas` (via *Inserir Dados*) para organizar o painel Dados. |
+| **09:20 – 10:00** | **Bloco 3:** Sintaxe, Operadores e Funções de Agregação | **Seção 4.3** (p. 92–95) | Criação das 7 medidas básicas na base real (`SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, `COUNTROWS`, `DISTINCTCOUNT`). Explicação prática do efeito do `0` nas OS Abertas/Canceladas sobre a função `AVERAGE`. |
+| **10:00 – 10:15** | *Intervalo (Coffee Break)* | — | — |
+| **10:15 – 10:55** | **Bloco 4:** Divisão Segura e Funções Lógicas | **Seção 4.4** (p. 95–98) | Proteção contra divisão por zero com `DIVIDE` e entendimento do `BLANK`. Classificação de linhas com `IF` (`Parada Longa >= 8h`) e faixas de custo com `SWITCH(TRUE(), ...)` respeitando a ordem restritiva dos testes. |
+| **10:55 – 11:25** | **Bloco 5:** Variáveis (`VAR` / `RETURN`) e Formatação | **Seção 4.5** (p. 98–100) | Refatoração de medidas usando `VAR` e `RETURN`. Uso de quebras de linha (`Shift+Enter`), comentários (`--`) e técnica de depuração trocando o retorno pela variável. |
+| **11:25 – 12:00** | **Bloco 6:** Contexto de Linha, Contexto de Filtro e Iteradores (`SUMX`/`AVERAGEX`) | **Seções 4.6 e 4.7** (p. 100–105) | Por que `SUM` dentro de uma coluna calculada repete `1.825,21 h` em todas as 350 linhas? Uso do `RELATED` para buscar dados do cadastro e uso do `SUMX` e `AVERAGEX` para calcular o custo de indisponibilidade linha a linha. |
+
+---
+
+## TURNO DA TARDE (13:00 às 15:30) — Laboratório Prático (Hands-on no Dataset Anexo)
+
+| Horário | Etapa do Laboratório | Seções do Livro | Entrega / Atividade do Aluno |
+| :--- | :--- | :---: | :--- |
+| **13:00 – 13:30** | **Lab 1:** Preparação do Modelo e Medidas de Agregação | **Seções 4.1, 4.2 e 4.3** | Relacionar o modelo, criar a tabela `Medidas` e construir os cartões de `Total de Horas Paradas`, `Custo Total`, `Quantidade de OS` e `Equipamentos com OS`. |
+| **13:30 – 14:00** | **Lab 2:** Divisão Segura e Colunas Lógicas | **Seção 4.4** | Criar a medida `Custo por Hora Parada` com `DIVIDE` e construir as colunas calculadas `Parada Longa` (`IF`) e `Faixa de Custo` (`SWITCH(TRUE())`). |
+| **14:00 – 14:15** | *Intervalo Rápido* | — | — |
+| **14:15 – 15:00** | **Lab 3:** Variáveis, `RELATED` e Iteradores (`SUMX` e `AVERAGEX`) | **Seções 4.5, 4.6 e 4.7** | Escrever medidas estruturadas com `VAR`/`RETURN`, buscar atributos com `RELATED` e calcular o **Custo de Parada (Lucro Cessante)** usando `SUMX` e `AVERAGEX`. |
+| **15:00 – 15:30** | **Lab 4:** Montagem da Matriz de Conferência e Fechamento | **Seções 4.1 a 4.7** | Montar a Matriz Final por Área e Equipamento, validar os números com o gabarito oficial no projetor e resolver os 5 exercícios da página 106 do livro. |
+
+---
+
+# GUIA DO PROFESSOR: EXPLICAÇÃO DE `SUMX` E `AVERAGEX` (SEÇÃO 4.7)
+
+> **Referência no Livro-Texto:** Seção 4.7 — *Iteradores SUMX e AVERAGEX* (páginas 103 a 105) e Seção 4.6 — *Contexto de Linha e Contexto de Filtro* (páginas 100 a 102).
+
+### 1. O Problema Real na Base da Planta
+Na nossa base de dados, temos duas informações separadas:
+* Na tabela fato `OS`, temos a coluna `OS[Horas Paradas]`.
+* Na tabela dimensão `Equipamentos`, temos a coluna `Equipamentos[Valor Hora Parada (R$)]` (por exemplo: parar o Forno `FO-01` custa **R$ 2.400/h** para a operação; parar o Hidrociclone `HC-01` custa **R$ 380/h**).
+
+Se o gerente perguntar: *"Qual foi o prejuízo operacional (custo de parada) causado pela indisponibilidade das máquinas?"*, **não podemos** simplesmente somar todas as horas paradas (`1.825,21 h`) e multiplicar pela média simples do valor hora do cadastro (`R$ 1.199,50`), pois isso daria **R$ 2.189.339,39** (um número errado, exatamente como alerta a página 103 do livro). Máquinas com valores de hora diferentes param por tempos diferentes!
+
+### 2. Como funcionam `SUMX` e `AVERAGEX`?
+As funções terminadas em **X** são **iteradores**. Elas recebem dois argumentos: uma **tabela** a ser percorrida e uma **expressão** a ser calculada linha por linha.
 
 ```text
-Sintaxe Geral:
-FUNCAO_X( <Tabela a Percorrer>, <Expressao Calculada em Cada Linha> )
+Sintaxe:
+SUMX( <Tabela>, <Expressao Avaliada Linha a Linha> )
+AVERAGEX( <Tabela>, <Expressao Avaliada Linha a Linha> )
 ```
+
+1. **Criação de Contexto de Linha:** O iterador vai até a primeira linha da tabela `OS`.
+2. **Travessia com `RELATED` (Seção 4.6):** Como a expressão está rodando na linha da tabela `OS` (lado muitos `*`) e o valor da hora está na tabela `Equipamentos` (lado um `1`), usamos `RELATED(Equipamentos[Valor Hora Parada (R$)])` para buscar a tarifa exata daquela máquina.
+3. **Cálculo Temporário:** Ele multiplica a hora daquela OS pelo valor da hora daquele equipamento.
+4. **Agregação Final:** Depois de repetir isso nas 350 linhas (ou nas linhas filtradas pelo visual), o `SUMX` soma todos os resultados temporários (chegando ao valor exato de **R$ 2.126.716,60**), enquanto o `AVERAGEX` tira a média aritmética desses produtos (**R$ 6.076,33 por OS**).
 
 ---
 
-### Exemplo Didático 1: `SUMX`
-Imagine que na tabela `OS` não tivéssemos a coluna `[Custo Total]`, apenas `[Custo Pecas]` e `[Custo Servicos]`.
+# COLINHA TÉCNICA (CHEAT SHEET DO ALUNO — CAPÍTULO 4)
 
-Se tentarmos escrever `SUM(OS[Custo Pecas] + OS[Custo Servicos])`, o DAX retornará **erro de sintaxe**, pois o `SUM` tradicional aceita apenas **uma única coluna** como argumento.
+### A. Operadores do DAX (Seção 4.3 — Tabela 4.4, p. 93)
 
-Com `SUMX`, dizemos ao DAX:
-> *"Vá até a tabela `OS`. Em cada linha, some Peças com Serviços. Guarde o valor. Quando terminar todas as linhas, some o total acumulado."*
+| Grupo | Operadores | Uso e Exemplo no Dataset da Planta |
+| :--- | :---: | :--- |
+| **Aritméticos** | `+` `-` `*` `/` `^` | `OS[Horas Paradas] * 60` (converte horas em minutos) |
+| **Comparação** | `=` `==` `<>` `>` `<` `>=` `<=` | `OS[Tipo de Manutenção] = "Corretiva"` (`==` diferencia vazio de zero) |
+| **Texto** | `&` | `OS[Equipamento] & " - " & OS[Tipo de Manutenção]` |
+| **Lógicos** | `&&` (E), `\|\|` (OU), `IN`, `NOT` | `OS[Horas Paradas] > 4 && OS[Tipo de Manutenção] = "Corretiva"` |
 
-```dax
-Custo Total via SUMX = 
-SUMX(
-    OS, 
-    OS[Custo Pecas] + OS[Custo Servicos]
-)
-```
+### B. Funções do Capítulo 4 (Seções 4.3 a 4.7)
 
-**O que o DAX faz nos bastidores:**
-* Linha 1 (OS-101): `5.000 + 4.000 = 9.000`
-* Linha 2 (OS-102): `500 + 1.500 = 2.000`
-* Linha 3 (OS-103): `4.000 + 2.000 = 6.000`
-* ...
-* **Consolidação Final:** `9.000 + 2.000 + 6.000 + ... = 42.000`
-
----
-
-### Exemplo Didático 2: `AVERAGEX`
-Suponha que você queira calcular a **taxa horária média das OS**, ou seja, calcular o custo por hora de cada ordem individualmente e depois tirar a média dessas taxas.
-
-Com `AVERAGEX`:
-```dax
-Taxa Horaria Media das OS = 
-AVERAGEX(
-    OS, 
-    DIVIDE(OS[Custo Total], OS[Horas Paradas])
-)
-```
-
-**O que o DAX faz nos bastidores:**
-* Linha 1 (OS-101): `9.000 / 6,0 = 1.500,00`
-* Linha 2 (OS-102): `2.000 / 2,5 = 800,00`
-* Linha 3 (OS-103): `6.000 / 4,0 = 1.500,00`
-* Linha 4 (OS-104): `18.000 / 8,0 = 2.250,00`
-* Linha 5 (OS-105): `Horas Paradas é BLANK` -> ignora ou retorna 0
-* ...
-* **Consolidação Final:** O `AVERAGEX` soma os resultados calculados e divide pelo número de ordens válidas avaliadas.
-
----
-
-# 2. CHEAT SHEET ("COLINHA TÉCNICA") COMPLETA
-
-### A. Operadores em DAX
-
-| Tipo | Operador | Função | Exemplo |
+| Função | Seção do Livro | Sintaxe no Dataset | O que faz |
 | :--- | :---: | :--- | :--- |
-| **Aritmético** | `+` | Adição | `[Custo Pecas] + [Custo Servicos]` |
-| | `-` | Subtração ou valor negativo | `[Custo Real] - [Custo Orcado]` |
-| | `*` | Multiplicação | `OS[Horas Paradas] * 1.5` |
-| | `/` | Divisão direta (atenção a div/0) | `[Custo Total] / [Horas Paradas]` |
-| | `^` | Exponenciação | `[Taxa] ^ 2` |
-| **Concatenação** | `&` | Une dois textos ou texto com valor | `Equipamentos[Equipamento] & " - " & Equipamentos[Area]` |
-| **Comparação** | `=` | Igual a | `OS[TipoOS] = "Corretiva"` |
-| | `==` | Estritamente igual (diferencia BLANK de 0) | `OS[Horas Paradas] == BLANK()` |
-| | `<>` | Diferente de | `OS[TipoOS] <> "Inspecao"` |
-| | `>`, `>=` | Maior que, Maior ou igual a | `OS[Horas Paradas] >= 4.0` |
-| | `<`, `<=` | Menor que, Menor ou igual a | `OS[Custo Total] <= 3000` |
-| **Lógico** | `&&` | E (*AND*) | `OS[TipoOS] = "Corretiva" && OS[Horas Paradas] > 4` |
-| | `\|\|` | OU (*OR*) | `Equipamentos[Area] = "Mina" \|\| Equipamentos[Area] = "Britagem"` |
-| | `IN` | Pertence a uma lista `{}` | `Equipamentos[Area] IN { "Mina", "Britagem" }` |
-| | `NOT()` | Negação lógica | `NOT(ISBLANK(OS[Horas Paradas]))` |
+| `SUM` | **4.3** (p. 93) | `SUM(OS[Horas Paradas])` | Soma todos os números da coluna no filtro atual. |
+| `AVERAGE` | **4.3** (p. 93) | `AVERAGE(OS[Horas Paradas])` | Média aritmética (o `0` entra na conta; o vazio `BLANK` fica de fora). |
+| `MIN` / `MAX` | **4.3** (p. 93) | `MAX(OS[Horas Paradas])` | Menor ou maior valor numérico ou de data no contexto. |
+| `COUNT` | **4.3** (p. 93) | `COUNT(OS[Data de Encerramento])` | Conta linhas onde a coluna possui valor preenchido (não vazio). |
+| `COUNTROWS` | **4.3** (p. 93) | `COUNTROWS(OS)` | Conta o total de linhas da tabela no contexto (com ou sem vazio). |
+| `DISTINCTCOUNT`| **4.3** (p. 93) | `DISTINCTCOUNT(OS[Equipamento])`| Conta quantos valores únicos existem na coluna. |
+| `DIVIDE` | **4.4** (p. 95) | `DIVIDE(Num, Den, [Alternativo])`| Divisão segura: devolve `BLANK` (ou alternativo) se o divisor for 0. |
+| `IF` | **4.4** (p. 96) | `IF(Teste, Valor_Se_V, [Valor_Se_F])`| Testa uma condição e devolve um entre dois resultados. |
+| `SWITCH` | **4.4** (p. 96) | `SWITCH(Expressao, Val1, Res1, ...)`| Compara um valor ou `TRUE()` contra uma lista sequencial de pares. |
+| `VAR` / `RETURN`| **4.5** (p. 98) | `VAR Nome = ... RETURN ...` | Guarda resultados parciais em variáveis e organiza a fórmula. |
+| `RELATED` | **4.6** (p. 102)| `RELATED(Equipamentos[Área])` | Em contexto de linha (lado `*`), busca um valor na dimensão (lado `1`). |
+| `SUMX` | **4.7** (p. 103)| `SUMX(OS, Expressao)` | Calcula uma expressão linha a linha na tabela e soma os resultados. |
+| `AVERAGEX` | **4.7** (p. 103)| `AVERAGEX(OS, Expressao)` | Calcula uma expressão linha a linha na tabela e tira a média final. |
 
 ---
 
-### B. Funções Agregadoras, Lógicas e Iteradores
-
-| Função | Sintaxe | Descrição / Aplicação no PCM |
-| :--- | :--- | :--- |
-| `SUM` | `SUM(Tabela[Coluna])` | Soma uma coluna numérica existente. |
-| `AVERAGE` | `AVERAGE(Tabela[Coluna])` | Média dos valores não vazios de uma coluna. |
-| `MIN` / `MAX` | `MIN(Coluna)` / `MAX(Coluna)` | Menor ou maior valor de tempo/custo registrado. |
-| `COUNTROWS` | `COUNTROWS(Tabela)` | Conta as linhas totais do contexto atual (volume de OS). |
-| `COUNTBLANK` | `COUNTBLANK(Tabela[Coluna])` | Conta valores nulos (ex.: ordens sem parada de máquina). |
-| `DISTINCTCOUNT` | `DISTINCTCOUNT(Coluna)` | Conta valores únicos (ex.: frota atendida sem duplicações). |
-| `DIVIDE` | `DIVIDE(Num, Den, [Alt])` | Divisão protegida contra divisão por zero e nulos. |
-| `IF` | `IF(Teste, Se_Verdadeiro, [Se_Falso])` | Avaliação condicional binária simples. |
-| `SWITCH` | `SWITCH(Valor, Caso1, Res1, ..., [Outro])` | Mapeia correspondências diretas de um mesmo campo. |
-| `SWITCH(TRUE)`| `SWITCH(TRUE(), Cond1, Res1, ...)` | Avalia múltiplas faixas e condições lógicas complexas. |
-| `SUMX` | `SUMX(Tabela, Expressão)` | Avalia uma expressão linha a linha e soma o total. |
-| `AVERAGEX` | `AVERAGEX(Tabela, Expressão)` | Avalia uma expressão linha a linha e calcula a média. |
+# CADERNO DE EXERCÍCIOS PRÁTICOS (TURNO DA TARDE)
+*(Todos os exercícios utilizam a base real anexada: `OS`, `Equipamentos` e `Calendário`)*
 
 ---
 
-# 3. BASE DE DADOS DO LABORATÓRIO
+### Atividade 1: Verificação do Modelo e Criação da Tabela de Medidas
+> **Referência no Livro-Texto:** **Seção 4.1** (*Modelo de Dados Visto pelo DAX*, p. 87–90) e **Seção 4.2** (*Colunas Calculadas e Medidas*, p. 90–92).
 
-### Tabela Dimensão: `Equipamentos`
-| Equipamento | Tipo | Area | Criticidade | CustoHoraParadaPadrao |
-| :--- | :--- | :--- | :---: | :--- |
-| **PF-01** | Perfuratriz | Mina | A | R$ 1.500 |
-| **PF-02** | Perfuratriz | Mina | B | R$ 1.200 |
-| **BR-01** | Britador | Britagem | A | R$ 2.000 |
-| **CV-01** | Correia Transp. | Pelotamento | C | R$ 500 |
-
-### Tabela Fato: `OS`
-| NumeroOS | Equipamento | TipoOS | Horas Paradas | Custo Pecas | Custo Servicos | Custo Total |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **OS-101** | PF-01 | Preventiva | 6,0 | R$ 5.000 | R$ 4.000 | R$ 9.000 |
-| **OS-102** | PF-01 | Ajuste | 2,5 | R$ 500 | R$ 1.500 | R$ 2.000 |
-| **OS-103** | PF-01 | Corretiva | 4,0 | R$ 4.000 | R$ 2.000 | R$ 6.000 |
-| **OS-104** | BR-01 | Corretiva | 8,0 | R$ 12.000 | R$ 6.000 | R$ 18.000 |
-| **OS-105** | BR-01 | Inspecao | *BLANK* | R$ 0 | R$ 800 | R$ 800 |
-| **OS-106** | CV-01 | Lubrificacao | *BLANK* | R$ 300 | R$ 400 | R$ 700 |
-| **OS-107** | PF-02 | Preventiva | 5,0 | R$ 3.000 | R$ 2.500 | R$ 5.500 |
+1. **Conferência dos Relacionamentos (Seção 4.1):**
+   * Abra a **Exibição de Modelo** e verifique se `Equipamentos[Equipamento]` está ligado a `OS[Equipamento]` (`1:*`, filtro único) e se `Calendário[Data]` está ligado a `OS[Data de Abertura]` (`1:*`, filtro único).
+2. **Tabela Organizadora de Medidas (Seção 4.2, p. 92):**
+   * Na guia *Página Inicial*, clique em **Inserir dados**, dê o nome `Medidas` à tabela e clique em *Carregar*. Depois de criar sua primeira medida nela, clique com o botão direito na `Coluna 1` e escolha **Ocultar da visualização de relatório**.
 
 ---
 
-# 4. CADERNO DE EXERCÍCIOS PRÁTICOS
+### Atividade 2: Funções de Agregação e a Armadilha do Zero vs. Vazio
+> **Referência no Livro-Texto:** **Seção 4.3** (*Sintaxe e Funções de Agregação*, p. 92–95).
+
+Crie as medidas abaixo dentro da tabela `Medidas` e coloque-as em visuais de Cartão para conferir os resultados:
+
+1. **Soma de Horas e Custos (Seção 4.3):**
+   ```dax
+   Total de Horas Paradas = SUM(OS[Horas Paradas])
+   ```
+   ```dax
+   Custo Total = SUM(OS[Custo (R$)])
+   ```
+   *Gabarito na Base Real:* `Total de Horas Paradas` = **1.825,21 h** | `Custo Total` = **R$ 1.856.370,13**.
+
+2. **Contagem de Linhas vs. Contagem de Valores Preenchidos (Seção 4.3, Tabela 4.5, p. 94):**
+   ```dax
+   Quantidade de OS = COUNTROWS(OS)
+   ```
+   ```dax
+   OS com Encerramento = COUNT(OS[Data de Encerramento])
+   ```
+   ```dax
+   Equipamentos com OS = DISTINCTCOUNT(OS[Equipamento])
+   ```
+   *Gabarito na Base Real:*
+   * `Quantidade de OS` = **350** (todas as linhas da tabela: 288 encerradas, 40 abertas e 22 canceladas).
+   * `OS com Encerramento` = **288** (a função `COUNT` ignora as 62 células em branco das OS abertas e canceladas!).
+   * `Equipamentos com OS` = **20** equipamentos distintos.
+
+3. **Maior Parada e Média Simples (Seção 4.3, Figura 4.7, p. 94–95):**
+   ```dax
+   Maior Parada = MAX(OS[Horas Paradas])
+   ```
+   ```dax
+   Média de Horas Paradas = AVERAGE(OS[Horas Paradas])
+   ```
+   *Gabarito e Discussão em Sala:*
+   * `Maior Parada` = **22,37 h** (OS `51216` do equipamento `DC-01`).
+   * `Média de Horas Paradas` = **5,21 h** (`1.825,21 / 350`).
+   * **Pergunta de Ouro para a Turma (Orientações da Base + p. 94 do Livro):** Por que `AVERAGE` deu `5,21 h` se a média real das OS encerradas é `6,34 h` (`1.825,21 / 288`)? Porque na nossa base as 62 OS Abertas e Canceladas vieram preenchidas com `0` na coluna `Horas Paradas`, e não vazias (`BLANK`)! Como ensina a **Seção 4.3 (p. 94)**, o `0` entra no divisor do `AVERAGE`.
 
 ---
 
-### Atividade 1: Agregações Numéricas e Contagens
-> **Referência Livro-Texto:** Capítulo 4 — *DAX Topic: SUM(), COUNT(), COUNTROWS(), MIN(), MAX(), COUNTBLANK()*
+### Atividade 3: Divisão Segura (`DIVIDE`) e Classificações Lógicas (`IF` e `SWITCH`)
+> **Referência no Livro-Texto:** **Seção 4.2** (p. 91) e **Seção 4.4** (*Divisão Segura e Funções Lógicas*, p. 95–98).
 
-1. **Total de Horas Paradas:**
+1. **Medida de Custo por Hora Parada com `DIVIDE` (Seções 4.2 e 4.4, p. 91 e 95):**
    ```dax
-   Total Horas Paradas = SUM(OS[Horas Paradas])
+   Custo por Hora Parada = DIVIDE(SUM(OS[Custo (R$)]), SUM(OS[Horas Paradas]))
    ```
-   *Gabarito de Validação:* Frota completa = **25,50 h** | PF-01 = **12,50 h**.
+   *Gabarito na Base Real:* Geral da Planta = **R$ 1.017,07 / h**.
+   *Teste de Divisão por Zero:* Coloque uma segmentação de `Status` na tela e clique em **Aberta** ou **Cancelada** (onde a soma de horas paradas é `0`). Com `DIVIDE`, o cartão fica em branco (`BLANK`) em vez de estourar o erro `Infinito`.
 
-2. **Custo Total de Manutenção:**
+2. **Coluna Calculada com `IF` (Seção 4.4, p. 96):**
+   Clique na tabela `OS`, escolha **Nova coluna** e crie o classificador de paradas longas (8 horas ou mais):
    ```dax
-   Total Custo Manutencao = SUM(OS[Custo Total])
+   Parada Longa = IF(OS[Horas Paradas] >= 8, "Longa", "Normal")
    ```
-   *Gabarito de Validação:* Consolidado da planta = **R$ 42.000,00**.
+   *Gabarito na Base Real:* **66 OS** serão classificadas como `"Longa"` e **284 OS** como `"Normal"`.
 
-3. **Volume Total de Ordens e Apontamentos sem Parada:**
-   Crie as medidas para auditar o backlog de serviços:
+3. **Coluna Calculada com `SWITCH(TRUE())` (Seção 4.4, Figura 4.9 e Tabela 4.7, p. 97):**
+   Ainda na tabela `OS`, clique em **Nova coluna** e classifique as ordens por faixa de custo respeitando a ordem do menor para o maior:
    ```dax
-   Total de OS = COUNTROWS(OS)
-   ```
-   ```dax
-   Qtd OS Sem Parada = COUNTBLANK(OS[Horas Paradas])
-   ```
-   ```dax
-   Qtd OS Com Parada = [Total de OS] - [Qtd OS Sem Parada]
-   ```
-   *Gabarito de Validação:* `Total de OS` = **7** | `Qtd OS Sem Parada` = **2** | `Qtd OS Com Parada` = **5**.
-
-4. **Cobertura de Ativos com Falha/Manutenção:**
-   ```dax
-   Ativos Atendidos = DISTINCTCOUNT(OS[Equipamento])
-   ```
-   *Gabarito de Validação:* Retorno = **4** equipamentos únicos.
-
----
-
-### Atividade 2: Concatenação, Comparação e Operadores
-> **Referência Livro-Texto:** Capítulo 4 — *DAX Topic: Operators (+, -, *, /, &, =, <>, IN)* & Capítulo 7 — *Calculated Columns*
-
-1. **Tag Identificadora Completa (Operador `&`):**
-   Adicione uma **coluna calculada** na tabela `Equipamentos`:
-   ```dax
-   TAG_Descritivo = Equipamentos[Equipamento] & " (" & Equipamentos[Area] & ")"
-   ```
-   *Exemplo de Saída:* `"PF-01 (Mina)"`, `"BR-01 (Britagem)"`.
-
-2. **Identificador de Parada Severa (Operador `>`):**
-   Adicione uma **coluna calculada** booleana na tabela `OS`:
-   ```dax
-   Flag_Severa = OS[Horas Paradas] >= 5.0
-   ```
-   *Gabarito de Validação:* Apenas **OS-101** (6,0 h), **OS-104** (8,0 h) e **OS-107** (5,0 h) resultam em `TRUE`.
-
----
-
-### Atividade 3: Funções Lógicas Condicionais (`IF` e `SWITCH`)
-> **Referência Livro-Texto:** Capítulo 12 — *DAX Topic: IF() and SWITCH()*
-
-1. **Classificação Binária de Tipo de Parada com `IF`:**
-   Adicione uma **coluna calculada** na tabela `OS` para separar intervenções com máquina paralisada de intervenções online:
-   ```dax
-   Status Operacional = 
-   IF(
-       ISBLANK(OS[Horas Paradas]) || OS[Horas Paradas] == 0,
-       "Equipamento Rodando",
-       "Interrupção de Produção"
-   )
-   ```
-
-2. **Decodificação de Criticidade com `SWITCH` (Valor Direto):**
-   Adicione uma **coluna calculada** na tabela `Equipamentos` para tornar clara a criticidade aos operadores de turno:
-   ```dax
-   Nivel Prioridade = 
-   SWITCH(
-       Equipamentos[Criticidade],
-       "A", "Gargalo Operacional",
-       "B", "Sistema Secundário",
-       "C", "Linha de Baixo Impacto",
-       "Não Classificado"
-   )
-   ```
-
-3. **Faixas de Custo da Ordem com `SWITCH(TRUE())`:**
-   Adicione uma **coluna calculada** na tabela `OS` categorizando os gastos em faixas financeiras de aprovação de diretoria:
-   ```dax
-   Faixa Orcamentaria = 
+   Faixa de Custo = 
    SWITCH(
        TRUE(),
-       OS[Custo Total] >= 10000, "Alçada Diretor (>= R$ 10.000)",
-       OS[Custo Total] >= 3000,  "Alçada Gerente (R$ 3.000 a R$ 9.999)",
-       "Alçada Supervisor (< R$ 3.000)"
+       OS[Custo (R$)] <= 1000, "Baixo",
+       OS[Custo (R$)] <= 5000, "Médio",
+       "Alto"
    )
    ```
-   *Gabarito de Validação:* A ordem **OS-104** (R$ 18.000) entra na alçada de Diretor; **OS-101, OS-103 e OS-107** entram em Gerente; as demais em Supervisor.
+   *Gabarito na Base Real:* **52 OS** caem em `"Baixo"`, **166 OS** em `"Médio"` e **132 OS** em `"Alto"`.
 
 ---
 
-### Atividade 4: Iteradores de Linha (`SUMX` e `AVERAGEX`)
-> **Referência Livro-Texto:** Capítulo 8 — *DAX Topic: The Basic Iterators SUMX() and AVERAGEX()*
+### Atividade 4: Variáveis (`VAR` / `RETURN`) e Formatação de Fórmulas
+> **Referência no Livro-Texto:** **Seção 4.5** (*Variáveis e Formatação das Fórmulas*, p. 98–100).
 
-1. **Reconstituição do Custo Total Linha a Linha via `SUMX`:**
-   Calcule o custo total somando as parcelas de peças e serviços diretamente em cada linha, sem usar a coluna `OS[Custo Total]`:
+1. **Medida Estruturada com Variáveis e Comentário (Seção 4.5, Figura 4.11, p. 98–99):**
+   Crie na tabela `Medidas` o cálculo de horas médias por OS usando variáveis e quebras de linha (`Shift+Enter`):
    ```dax
-   Custo Recomposto SUMX = 
+   Horas Médias por OS = 
+   VAR Horas = SUM(OS[Horas Paradas])
+   VAR Quantidade = COUNTROWS(OS)
+   RETURN
+       DIVIDE(Horas, Quantidade)
+   -- Regra: divide o total de horas pelo total de OS do contexto
+   ```
+2. **Teste de Depuração (Seção 4.5, p. 98):**
+   Peça aos alunos para trocarem temporariamente a linha após o `RETURN` apenas por `Horas` e depois por `Quantidade`, observando como as variáveis permitem auditar cada etapa da conta sem criar medidas extras.
+
+---
+
+### Atividade 5: Contexto de Linha, `RELATED` e Iteradores (`SUMX` e `AVERAGEX`)
+> **Referência no Livro-Texto:** **Seção 4.6** (*Contexto de Linha e Contexto de Filtro*, p. 100–102) e **Seção 4.7** (*Iteradores SUMX e AVERAGEX*, p. 103–105).
+
+1. **Buscando Dados do Cadastro com `RELATED` (Seção 4.6, Figura 4.14, p. 102):**
+   Na tabela `OS`, crie uma **Nova coluna** para trazer a Criticidade do equipamento:
+   ```dax
+   Criticidade do Equipamento = RELATED(Equipamentos[Criticidade])
+   ```
+   *Explicação em Sala:* Sem o `RELATED`, digitar `Equipamentos[Criticidade]` direto na coluna calculada da `OS` gera erro, pois o contexto de linha não atravessa o relacionamento sozinho.
+
+2. **Calculando o Custo de Parada (Indisponibilidade) com `SUMX` (Seção 4.7, p. 103):**
+   Crie na tabela `Medidas` a fórmula que percorre a tabela `OS` multiplicando as horas paradas de cada ordem pelo valor da hora parada daquela máquina no cadastro:
+   ```dax
+   Custo de Parada = 
    SUMX(
        OS, 
-       OS[Custo Pecas] + OS[Custo Servicos]
+       OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])
    )
    ```
-   *Gabarito de Validação:* O resultado deve ser rigorosamente idêntico a `SUM(OS[Custo Total])`: **R$ 42.000,00**.
+   *Gabarito na Base Real:* **R$ 2.126.716,60** (muito diferente do atalho errado de multiplicar o total de horas pela média simples dos valores hora, que daria R$ 2.189.339,39).
 
-2. **Custo Médio Operacional de Peças por Ordem via `AVERAGEX`:**
-   Calcule a média de peças gastas por intervenção aplicando a varredura linha a linha:
+3. **Custo de Parada Médio por OS com `AVERAGEX` (Seção 4.7, p. 104):**
+   Crie a medida que tira a média dos produtos calculados linha a linha:
    ```dax
-   Media Pecas por OS = 
+   Custo de Parada Médio por OS = 
    AVERAGEX(
        OS, 
-       OS[Custo Pecas]
+       OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])
    )
    ```
-   *Gabarito de Validação:* 
-   * Cálculo: `(5000 + 500 + 4000 + 12000 + 0 + 300 + 3000) / 7`
-   * Resultado: **R$ 3.542,86 por OS**.
+   *Gabarito na Base Real:* **R$ 6.076,33** por OS.
 
 ---
 
-### Atividade 5: Divisão Segura e *Measure Branching*
-> **Referência Livro-Texto:** Capítulo 4 — *DAX Topic: DIVIDE() and Measure Branching*
+# 5. GABARITO DE CONFERÊNCIA FINAL DO LABORATÓRIO (BASE REAL ANEXADA)
 
-1. **Custo Real Ponderado da Hora Parada (Resposta da PF-01):**
-   ```dax
-   Custo Real Por Hora Parada = 
-   DIVIDE(
-       [Total Custo Manutencao], 
-       [Total Horas Paradas], 
-       0
-   )
-   ```
-   *Gabarito de Validação:*
-   * Para **PF-01**: `R$ 17.000,00 / 12,50 h` = **R$ 1.360,00 / h**.
-   * Para o consolidado da **Planta**: `R$ 42.000,00 / 25,50 h` = **R$ 1.647,06 / h**.
+Ao final da tarde (15:00), peça aos alunos para montarem uma **Matriz** com `Equipamentos[Área]` e `Equipamentos[Equipamento]` nas linhas e as medidas criadas nos valores. Os números na tela de todos devem bater exatamente com as tabelas abaixo:
 
-2. **Custo Médio Financeiro por OS Emitida (*Measure Branching*):**
-   ```dax
-   Custo Medio Por OS = 
-   DIVIDE(
-       [Total Custo Manutencao], 
-       [Total de OS], 
-       0
-   )
-   ```
-   *Gabarito de Validação:* `R$ 42.000,00 / 7 OS` = **R$ 6.000,00 / OS**.
+### A. Resumo Consolidado por Área (`Equipamentos[Área]`)
 
----
+| Área | Quantidade de OS | Total de Horas Paradas | Custo Total (OS) | Custo por Hora Parada | Custo de Parada (`SUMX`) | Custo Parada Médio (`AVERAGEX`) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Beneficiamento** | 95 | 491,20 h | R$ 418.210,87 | R$ 851,41 / h | R$ 367.855,60 | R$ 3.872,16 |
+| **Britagem** | 109 | 561,01 h | R$ 585.816,74 | R$ 1.044,22 / h | R$ 584.530,80 | R$ 5.362,67 |
+| **Concentração** | 39 | 212,67 h | R$ 217.560,72 | R$ 1.023,00 / h | R$ 141.158,60 | R$ 3.619,45 |
+| **Filtragem** | 40 | 222,22 h | R$ 207.285,37 | R$ 932,79 / h | R$ 228.597,20 | R$ 5.714,93 |
+| **Moagem** | 32 | 164,89 h | R$ 220.474,01 | R$ 1.337,10 / h | R$ 272.770,10 | R$ 8.524,07 |
+| **Pelotização** | 35 | 173,22 h | R$ 207.022,42 | R$ 1.195,14 / h | R$ 348.765,50 | R$ 9.964,73 |
+| **Utilidades** | 20 | 106,33 h | R$ 143.930,42 | R$ 1.353,62 / h | R$ 140.355,60 | R$ 7.017,78 |
+| **TOTAL PLANTA** | **350** | **1.825,21 h** | **R$ 1.856.370,13** | **R$ 1.017,07 / h** | **R$ 2.126.716,60** | **R$ 6.076,33** |
 
-# 5. MATRIZ DE CONFERÊNCIA FINAL (GABARITO DO ALUNO)
+*(Nota técnica: A soma das linhas de área acima reflete os agrupamentos; o Total Geral da Planta para as 350 OS é exatamente **1.825,21 h** e **R$ 1.856.370,13**).*
 
-Monte no Power BI um visual do tipo **Matriz** colocando a coluna `Equipamentos[Equipamento]` nas linhas e verifique os valores calculados:
+### B. Amostra por Equipamento (Para Validação de `SUMX` vs. `DIVIDE`)
 
-| Equipamento | Total Custo Manutencao | Total Horas Paradas | Qtd OS Com Parada | Custo Real Por Hora Parada | Custo Recomposto SUMX |
-| :--- | :--- | :--- | :---: | :--- | :--- |
-| **BR-01** | R$ 18.800,00 | 8,00 h | 1 | R$ 2.350,00 / h | R$ 18.800,00 |
-| **CV-01** | R$ 700,00 | 0,00 h | 0 | R$ 0,00 / h | R$ 700,00 |
-| **PF-01** | R$ 17.000,00 | 12,50 h | 3 | **R$ 1.360,00 / h** | R$ 17.000,00 |
-| **PF-02** | R$ 5.500,00 | 5,00 h | 1 | R$ 1.100,00 / h | R$ 5.500,00 |
-| **TOTAL** | **R$ 42.000,00** | **25,50 h** | **5** | **R$ 1.647,06 / h** | **R$ 42.000,00** |
+| Equipamento | Área | Valor Hora (Cadastro) | Qtd OS | Total de Horas Paradas | Custo Total (OS) | Custo por Hora Parada (`DIVIDE`) | Custo de Parada (`SUMX`) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **BR-01** | Britagem | R$ 1.850 | 18 | 93,97 h | R$ 104.264,53 | R$ 1.109,55 / h | R$ 173.844,50 |
+| **FO-01** | Pelotização | R$ 2.400 | 18 | 86,29 h | R$ 84.991,92 | R$ 984,96 / h | R$ 207.096,00 |
+| **MO-01** | Moagem | R$ 2.100 | 16 | 93,86 h | R$ 117.163,91 | R$ 1.248,28 / h | R$ 197.106,00 |
+| **MO-02** | Moagem | R$ 1.980 | 16 | 71,03 h | R$ 75.595,04 | R$ 1.064,27 / h | R$ 140.639,40 |
+| **PE-01** | Pelotização | R$ 1.750 | 17 | 80,95 h | R$ 96.403,38 | R$ 1.190,90 / h | R$ 141.662,50 |
+| **SM-01** | Concentração| R$ 680 | 16 | 85,48 h | R$ 72.186,87 | R$ 844,49 / h | R$ 58.126,40 |
+| **SM-02** | Concentração| R$ 650 | 23 | 127,19 h | R$ 145.373,85 | R$ 1.142,97 / h | R$ 82.673,50 |
+| **TR-02** | Britagem | R$ 640 | 25 | 168,26 h | R$ 160.343,19 | R$ 952,95 / h | R$ 107.686,40 |
