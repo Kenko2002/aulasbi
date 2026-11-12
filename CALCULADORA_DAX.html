@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Interativo DAX - Capítulo 4 (Manutenção)</title>
+    <style>
+        :root {
+            --primary: #4f2d7f;
+            --primary-light: #6b3fa0;
+            --accent: #f2c811;
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), #2e1650);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-pbi {
+            background-color: var(--accent);
+            color: #111;
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .header-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 25px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1080px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sec-tag {
+            background-color: #ede9fe;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 3px 9px;
+            border-radius: 6px;
+            border: 1px solid #ddd6fe;
+            white-space: nowrap;
+        }
+
+        /* Filtros da Colinha */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Tabela da Colinha */
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 540px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #334155;
+            text-align: left;
+            padding: 10px 12px;
+            position: sticky;
+            top: 0;
+            border-bottom: 2px solid var(--border);
+            z-index: 1;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background-color: #f8f5ff;
+        }
+
+        .code-pill {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            border: 1px solid #cbd5e1;
+            display: inline-block;
+        }
+
+        .btn-insert-row {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 4px 9px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-insert-row:hover {
+            background: var(--primary);
+        }
+
+        /* Construtor Interativo DAX */
+        .mission-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 5px solid var(--warning);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mission-select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d97706;
+            font-weight: 600;
+            font-size: 0.88rem;
+            background: white;
+            margin-bottom: 8px;
+        }
+
+        .mission-desc {
+            font-size: 0.86rem;
+            color: #78350f;
+        }
+
+        /* Paleta de Blocos Clicáveis */
+        .palette-group {
+            margin-bottom: 12px;
+        }
+
+        .palette-label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+
+        .chip:active {
+            transform: scale(0.96);
+        }
+
+        .chip-fn {
+            background: #e0e7ff;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .chip-col-os {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .chip-col-eq {
+            background: #fae8ff;
+            color: #86198f;
+            border-color: #f5d0fe;
+        }
+
+        .chip-op {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-color: #d1d5db;
+        }
+
+        /* Barra de Fórmulas estilo Power BI */
+        .pbi-formula-bar {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--code-text);
+            margin-top: 12px;
+            border: 2px solid #313244;
+        }
+
+        .pbi-bar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.78rem;
+            color: #a6adc8;
+        }
+
+        .fx-icon {
+            background: #45475a;
+            color: var(--accent);
+            font-weight: bold;
+            font-style: italic;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+
+        textarea#daxEditor {
+            width: 100%;
+            min-height: 125px;
+            background: #181825;
+            color: #f8f8f2;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea#daxEditor:focus {
+            border-color: var(--accent);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.83rem;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-light); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--accent);
+            color: #111;
+        }
+
+        .btn-outline {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* Painel de Diagnóstico e Resultado */
+        .feedback-panel {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            font-size: 0.86rem;
+        }
+
+        .status-ok { color: #047857; font-weight: 700; }
+        .status-err { color: #b91c1c; font-weight: 700; }
+
+        .sim-result-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .kpi-mini {
+            background: white;
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--primary);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .kpi-mini .label {
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .kpi-mini .val {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-top: 2px;
+        }
+
+        /* Simulador Visual SUMX / AVERAGEX */
+        .iter-grid {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.82rem;
+        }
+
+        .iter-highlight {
+            background: #fef9c3;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">
+        <h1>
+            <span>⚡ Laboratório Interativo DAX — Capítulo 4</span>
+            <span class="badge-pbi">Power BI para Manutenção</span>
+        </h1>
+        <div class="header-subtitle">
+            Colinha Oficial de Funções, Operadores e Construtor Prático de Fórmulas (Seções 4.1 a 4.7 do Livro)
+        </div>
+    </div>
+    <div>
+        <span class="sec-tag" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            Base Oficial: 350 OS | 20 Equipamentos | 1.825,21 Horas Paradas
+        </span>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- COLUNA ESQUERDA: COLINHA INTERATIVA + SIMULADOR SUMX -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2>📚 Colinha Técnica de Funções e Operadores</h2>
+                <span class="sec-tag">Seções 4.1 a 4.7</span>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterTable('ALL', this)">Todos</button>
+                <button class="filter-btn" onclick="filterTable('4.3-OP', this)">Operadores (4.3)</button>
+                <button class="filter-btn" onclick="filterTable('4.3-AG', this)">Agregação (4.3)</button>
+                <button class="filter-btn" onclick="filterTable('4.4', this)">Lógicas & DIVIDE (4.4)</button>
+                <button class="filter-btn" onclick="filterTable('4.5', this)">Variáveis (4.5)</button>
+                <button class="filter-btn" onclick="filterTable('4.6-4.7', this)">RELATED & Iteradores (4.6 e 4.7)</button>
+                <input type="text" id="searchBox" class="search-input" placeholder="🔍 Buscar função, operador ou seção..." oninput="searchTable()">
+            </div>
+
+            <div class="table-wrapper">
+                <table id="cheatTable">
+                    <thead>
+                        <tr>
+                            <th>Item / Função</th>
+                            <th>Seção</th>
+                            <th>Sintaxe / Exemplo na Base</th>
+                            <th>O que faz na Manutenção</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- OPERADORES (SEÇÃO 4.3) -->
+                        <tr data-cat="4.3-OP">
+                            <td><span class="code-pill">+ - * / ^</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93</small></td>
+                            <td><span class="code-pill">OS[Horas Paradas] * 60</span></td>
+                            <td>Operadores aritméticos (soma, subtração, produto, divisão e potência).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken(' * ')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-OP">
+                            <td><span class="code-pill">= == &lt;&gt; &gt; &lt; &gt;= &lt;=</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93</small></td>
+                            <td><span class="code-pill">OS[Horas Paradas] &gt;= 8</span></td>
+                            <td>Operadores de comparação. O <span class="code-pill">==</span> é estrito (não trata vazio como zero).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken(' >= ')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-OP">
+                            <td><span class="code-pill">&amp;</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93</small></td>
+                            <td><span class="code-pill">OS[Equipamento] &amp; " - " &amp; OS[Status]</span></td>
+                            <td>Concatena (junta) dois textos ou colunas em uma string única.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken(' & &quot; - &quot; & ')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-OP">
+                            <td><span class="code-pill">&amp;&amp;  ||  IN  NOT</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93</small></td>
+                            <td><span class="code-pill">OS[Horas Paradas] &gt; 4 &amp;&amp; OS[Status] = "Encerrada"</span></td>
+                            <td>Operadores lógicos: <span class="code-pill">&amp;&amp;</span> (E), <span class="code-pill">||</span> (OU), <span class="code-pill">IN</span> (lista) e <span class="code-pill">NOT</span> (negação).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken(' && ')">+ Inserir</button></td>
+                        </tr>
+
+                        <!-- AGREGAÇÃO (SEÇÃO 4.3) -->
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">SUM()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–94</small></td>
+                            <td><span class="code-pill">SUM(OS[Horas Paradas])</span></td>
+                            <td>Soma os valores numéricos de uma única coluna respeitando os filtros do visual.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('SUM(OS[Horas Paradas])')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">AVERAGE()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–95</small></td>
+                            <td><span class="code-pill">AVERAGE(OS[Horas Paradas])</span></td>
+                            <td>Média aritmética da coluna. <strong>Atenção:</strong> o zero entra no divisor; o vazio fica de fora!</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('AVERAGE(OS[Horas Paradas])')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">MIN() / MAX()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–95</small></td>
+                            <td><span class="code-pill">MAX(OS[Horas Paradas])</span></td>
+                            <td>Retorna o menor ou o maior valor (numérico ou data) no contexto filtrado.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('MAX(OS[Horas Paradas])')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">COUNT()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–94</small></td>
+                            <td><span class="code-pill">COUNT(OS[Data de Encerramento])</span></td>
+                            <td>Conta quantas células estão preenchidas na coluna (ignora células em branco).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('COUNT(OS[Data de Encerramento])')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">COUNTROWS()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–94</small></td>
+                            <td><span class="code-pill">COUNTROWS(OS)</span></td>
+                            <td>Conta o total de linhas da tabela no contexto (padrão para contar volume de OS).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('COUNTROWS(OS)')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.3-AG">
+                            <td><span class="code-pill">DISTINCTCOUNT()</span></td>
+                            <td><span class="sec-tag">Seção 4.3</span><br><small>p. 93–94</small></td>
+                            <td><span class="code-pill">DISTINCTCOUNT(OS[Equipamento])</span></td>
+                            <td>Conta quantos códigos únicos de equipamentos tiveram OS sem repetir.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('DISTINCTCOUNT(OS[Equipamento])')">+ Inserir</button></td>
+                        </tr>
+
+                        <!-- DIVISÃO SEGURA E LÓGICAS (SEÇÃO 4.4) -->
+                        <tr data-cat="4.4">
+                            <td><span class="code-pill">DIVIDE()</span></td>
+                            <td><span class="sec-tag">Seção 4.4</span><br><small>p. 95–96</small></td>
+                            <td><span class="code-pill">DIVIDE(SUM(OS[Custo (R$)]), SUM(OS[Horas Paradas]))</span></td>
+                            <td>Divisão segura: retorna <span class="code-pill">BLANK</span> (ou 3º argumento) se o denominador for 0.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('DIVIDE(, )')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.4">
+                            <td><span class="code-pill">IF()</span></td>
+                            <td><span class="sec-tag">Seção 4.4</span><br><small>p. 96</small></td>
+                            <td><span class="code-pill">IF(OS[Horas Paradas] &gt;= 8, "Longa", "Normal")</span></td>
+                            <td>Testa uma condição lógica e devolve o 2º argumento se verdadeira ou o 3º se falsa.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('IF(OS[Horas Paradas] >= 8, &quot;Longa&quot;, &quot;Normal&quot;)')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.4">
+                            <td><span class="code-pill">SWITCH(TRUE())</span></td>
+                            <td><span class="sec-tag">Seção 4.4</span><br><small>p. 96–97</small></td>
+                            <td><span class="code-pill">SWITCH(TRUE(), OS[Custo (R$)] &lt;= 1000, "Baixo", ...)</span></td>
+                            <td>Avalia múltiplos testes de cima para baixo e para no primeiro verdadeiro (faixas).</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('SWITCH(\n    TRUE(),\n    OS[Custo (R$)] <= 1000, &quot;Baixo&quot;,\n    OS[Custo (R$)] <= 5000, &quot;Médio&quot;,\n    &quot;Alto&quot;\n)')">+ Inserir</button></td>
+                        </tr>
+
+                        <!-- VARIÁVEIS (SEÇÃO 4.5) -->
+                        <tr data-cat="4.5">
+                            <td><span class="code-pill">VAR ... RETURN</span></td>
+                            <td><span class="sec-tag">Seção 4.5</span><br><small>p. 98–100</small></td>
+                            <td><span class="code-pill">VAR Horas = SUM(...) RETURN DIVIDE(Horas, ...)</span></td>
+                            <td>Guarda partes da conta com nome próprio, calcula uma só vez e facilita depuração.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('VAR Horas = SUM(OS[Horas Paradas])\nVAR Quantidade = COUNTROWS(OS)\nRETURN\n    DIVIDE(Horas, Quantidade)')">+ Inserir</button></td>
+                        </tr>
+
+                        <!-- CONTEXTO E ITERADORES (SEÇÕES 4.6 E 4.7) -->
+                        <tr data-cat="4.6-4.7">
+                            <td><span class="code-pill">RELATED()</span></td>
+                            <td><span class="sec-tag">Seção 4.6</span><br><small>p. 102</small></td>
+                            <td><span class="code-pill">RELATED(Equipamentos[Valor Hora Parada (R$)])</span></td>
+                            <td>Em contexto de linha na tabela fato (`OS`), sobe o relacionamento `*:1` até o cadastro.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('RELATED(Equipamentos[Valor Hora Parada (R$)])')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.6-4.7">
+                            <td><span class="code-pill">SUMX()</span></td>
+                            <td><span class="sec-tag">Seção 4.7</span><br><small>p. 103–105</small></td>
+                            <td><span class="code-pill">SUMX(OS, OS[Horas Paradas] * RELATED(...))</span></td>
+                            <td>Iterador: percorre a tabela linha a linha, calcula a expressão e <strong>soma</strong> os resultados no fim.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('SUMX(\n    OS,\n    OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])\n)')">+ Inserir</button></td>
+                        </tr>
+                        <tr data-cat="4.6-4.7">
+                            <td><span class="code-pill">AVERAGEX()</span></td>
+                            <td><span class="sec-tag">Seção 4.7</span><br><small>p. 103–105</small></td>
+                            <td><span class="code-pill">AVERAGEX(OS, OS[Horas Paradas] * RELATED(...))</span></td>
+                            <td>Iterador: percorre a tabela linha a linha, calcula a expressão e tira a <strong>média</strong> final.</td>
+                            <td><button class="btn-insert-row" onclick="insertToken('AVERAGEX(\n    OS,\n    OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])\n)')">+ Inserir</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CARD DIDÁTICO: VISUALIZADOR PASSO A PASSO DE SUMX / AVERAGEX -->
+        <div class="card">
+            <div class="card-header">
+                <h2>⚙️ Raio-X Visual: Como `SUMX` e `AVERAGEX` Funcionam</h2>
+                <span class="sec-tag">Seção 4.7 (p. 103–105)</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+                Veja na prática as 5 primeiras linhas encerradas do dataset real. O iterador cria um contexto de linha, busca a tarifa do equipamento via <span class="code-pill">RELATED</span>, multiplica pela hora parada e só agrega no final:
+            </p>
+            <table class="iter-grid">
+                <thead>
+                    <tr>
+                        <th>Nº da OS</th>
+                        <th>Equipamento</th>
+                        <th>OS[Horas Paradas]</th>
+                        <th>RELATED(Valor Hora)</th>
+                        <th>Expressão Linha a Linha (Horas × Valor)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>51020</td>
+                        <td>MO-02 (Moagem)</td>
+                        <td>5,37 h</td>
+                        <td>R$ 1.980,00</td>
+                        <td>5,37 × 1.980 = <strong>R$ 10.632,60</strong></td>
+                    </tr>
+                    <tr>
+                        <td>51021</td>
+                        <td>MO-01 (Moagem)</td>
+                        <td>11,63 h</td>
+                        <td>R$ 2.100,00</td>
+                        <td>11,63 × 2.100 = <strong>R$ 24.423,00</strong></td>
+                    </tr>
+                    <tr>
+                        <td>51022</td>
+                        <td>MO-02 (Moagem)</td>
+                        <td>2,74 h</td>
+                        <td>R$ 1.980,00</td>
+                        <td>2,74 × 1.980 = <strong>R$ 5.425,20</strong></td>
+                    </tr>
+                    <tr>
+                        <td>51024</td>
+                        <td>SM-01 (Concentração)</td>
+                        <td>11,53 h</td>
+                        <td>R$ 680,00</td>
+                        <td>11,53 × 680 = <strong>R$ 7.840,40</strong></td>
+                    </tr>
+                    <tr>
+                        <td>51025</td>
+                        <td>FO-01 (Pelotização)</td>
+                        <td>7,52 h</td>
+                        <td>R$ 2.400,00</td>
+                        <td>7,52 × 2.400 = <strong>R$ 18.048,00</strong></td>
+                    </tr>
+                    <tr class="iter-highlight">
+                        <td colspan="4">Consolidação nas 350 linhas da base oficial:</td>
+                        <td>
+                            SUMX = R$ 2.126.716,60<br>
+                            AVERAGEX = R$ 6.076,33 / OS
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COLUNA DIREITA: CONSTRUTOR DE FÓRMULAS DAX (SANDBOX DO ALUNO) -->
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2>🛠️ Construtor Guiado de Fórmulas DAX</h2>
+                <span class="sec-tag">Prática Hands-on</span>
+            </div>
+
+            <!-- Seletor de Missão da Aula -->
+            <div class="mission-box">
+                <div class="mission-header">
+                    <strong>🎯 Escolha a Atividade do Caderno de Exercícios:</strong>
+                    <span id="missionSecBadge" class="sec-tag">Seção 4.3 (p. 93)</span>
+                </div>
+                <select id="missionSelect" class="mission-select" onchange="loadMission()">
+                    <option value="0">1. Soma de Horas Paradas (Medida com SUM) — Seção 4.3</option>
+                    <option value="1">2. Quantidade Total de OS (Medida com COUNTROWS) — Seção 4.3</option>
+                    <option value="2">3. Custo por Hora Parada Protegido (Medida com DIVIDE) — Seções 4.2 e 4.4</option>
+                    <option value="3">4. Classificação de Parada Longa >= 8h (Coluna com IF) — Seção 4.4</option>
+                    <option value="4">5. Faixa de Custo da OS (Coluna com SWITCH TRUE) — Seção 4.4</option>
+                    <option value="5">6. Horas Médias por OS com Variáveis (VAR / RETURN) — Seção 4.5</option>
+                    <option value="6">7. Trazer Criticidade do Cadastro (Coluna com RELATED) — Seção 4.6</option>
+                    <option value="7">8. Custo de Parada / Indisponibilidade (Medida com SUMX) — Seção 4.7</option>
+                    <option value="8">9. Custo de Parada Médio por OS (Medida com AVERAGEX) — Seção 4.7</option>
+                </select>
+                <div id="missionDesc" class="mission-desc">
+                    Crie uma medida chamada <strong>Total de Horas Paradas</strong> que some a coluna <code>OS[Horas Paradas]</code>.
+                </div>
+            </div>
+
+            <!-- Paleta de Botões para Montar a Fórmula -->
+            <div class="palette-group">
+                <div class="palette-label">
+                    <span>1. Funções DAX (Clique para inserir no cursor)</span>
+                </div>
+                <div class="chip-container">
+                    <span class="chip chip-fn" onclick="insertToken('SUM(')">SUM(</span>
+                    <span class="chip chip-fn" onclick="insertToken('AVERAGE(')">AVERAGE(</span>
+                    <span class="chip chip-fn" onclick="insertToken('COUNT(')">COUNT(</span>
+                    <span class="chip chip-fn" onclick="insertToken('COUNTROWS(')">COUNTROWS(</span>
+                    <span class="chip chip-fn" onclick="insertToken('DISTINCTCOUNT(')">DISTINCTCOUNT(</span>
+                    <span class="chip chip-fn" onclick="insertToken('DIVIDE(')">DIVIDE(</span>
+                    <span class="chip chip-fn" onclick="insertToken('IF(')">IF(</span>
+                    <span class="chip chip-fn" onclick="insertToken('SWITCH(TRUE(), ')">SWITCH(TRUE(), </span>
+                    <span class="chip chip-fn" onclick="insertToken('VAR ')">VAR </span>
+                    <span class="chip chip-fn" onclick="insertToken('\nRETURN\n    ')">RETURN</span>
+                    <span class="chip chip-fn" onclick="insertToken('RELATED(')">RELATED(</span>
+                    <span class="chip chip-fn" onclick="insertToken('SUMX(OS, ')">SUMX(OS, </span>
+                    <span class="chip chip-fn" onclick="insertToken('AVERAGEX(OS, ')">AVERAGEX(OS, </span>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-label">
+                    <span>2. Tabelas e Colunas do Dataset Real</span>
+                </div>
+                <div class="chip-container">
+                    <span class="chip chip-col-os" onclick="insertToken('OS')">OS</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Horas Paradas]')">OS[Horas Paradas]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Custo (R$)]')">OS[Custo (R$)]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Horas Previstas]')">OS[Horas Previstas]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Tipo de Manutenção]')">OS[Tipo de Manutenção]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Status]')">OS[Status]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Equipamento]')">OS[Equipamento]</span>
+                    <span class="chip chip-col-os" onclick="insertToken('OS[Data de Encerramento]')">OS[Data de Encerramento]</span>
+                    <span class="chip chip-col-eq" onclick="insertToken('Equipamentos[Valor Hora Parada (R$)]')">Equipamentos[Valor Hora Parada (R$)]</span>
+                    <span class="chip chip-col-eq" onclick="insertToken('Equipamentos[Criticidade]')">Equipamentos[Criticidade]</span>
+                    <span class="chip chip-col-eq" onclick="insertToken('Equipamentos[Área]')">Equipamentos[Área]</span>
+                </div>
+            </div>
+
+            <div class="palette-group">
+                <div class="palette-label">
+                    <span>3. Operadores e Pontuação</span>
+                </div>
+                <div class="chip-container">
+                    <span class="chip chip-op" onclick="insertToken(' = ')">=</span>
+                    <span class="chip chip-op" onclick="insertToken(', ')">, (vírgula)</span>
+                    <span class="chip chip-op" onclick="insertToken(')')">)</span>
+                    <span class="chip chip-op" onclick="insertToken(' + ')">+</span>
+                    <span class="chip chip-op" onclick="insertToken(' - ')">-</span>
+                    <span class="chip chip-op" onclick="insertToken(' * ')">*</span>
+                    <span class="chip chip-op" onclick="insertToken(' / ')">/</span>
+                    <span class="chip chip-op" onclick="insertToken(' >= ')">&gt;=</span>
+                    <span class="chip chip-op" onclick="insertToken(' <= ')">&lt;=</span>
+                    <span class="chip chip-op" onclick="insertToken(' && ')">&amp;&amp;</span>
+                    <span class="chip chip-op" onclick="insertToken(' || ')">||</span>
+                    <span class="chip chip-op" onclick="insertToken(' & ')">&amp;</span>
+                    <span class="chip chip-op" onclick="insertToken('&quot;&quot;')">"Texto"</span>
+                </div>
+            </div>
+
+            <!-- Barra de Fórmulas Interativa -->
+            <div class="pbi-formula-bar">
+                <div class="pbi-bar-top">
+                    <div><span class="fx-icon">fx</span> Barra de Fórmulas DAX (Digite ou monte clicando nos blocos acima)</div>
+                    <div id="parenCounter">Parênteses: 0 abertos / 0 fechados</div>
+                </div>
+                <textarea id="daxEditor" spellcheck="false" oninput="validateFormula()">Total de Horas Paradas = </textarea>
+                <div class="editor-actions">
+                    <button class="btn btn-success" onclick="checkAnswer()">✅ Verificar Fórmula & Ver Resultado</button>
+                    <button class="btn btn-warning" onclick="showSolution()">💡 Preencher Gabarito Oficial</button>
+                    <button class="btn btn-primary" onclick="copyFormula()">📋 Copiar para o Power BI</button>
+                    <button class="btn btn-outline" onclick="clearEditor()">🗑️ Limpar</button>
+                </div>
+            </div>
+
+            <!-- Diagnóstico de Sintaxe e Gabarito Numérico -->
+            <div class="feedback-panel" id="feedbackBox">
+                <div id="syntaxMessage">Digite ou clique nos blocos acima para montar sua expressão DAX.</div>
+                <div class="sim-result-box" id="kpiPreview">
+                    <div class="kpi-mini">
+                        <div class="label">Resultado Geral na Planta</div>
+                        <div class="val" id="resPlanta">1.825,21 h</div>
+                    </div>
+                    <div class="kpi-mini">
+                        <div class="label">Recorte: Britagem (BR-01)</div>
+                        <div class="val" id="resEq">93,97 h</div>
+                    </div>
+                    <div class="kpi-mini">
+                        <div class="label">Onde criar no Power BI</div>
+                        <div class="val" id="resTipo" style="font-size:0.95rem; color:var(--primary);">Nova Medida</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const missions = [
+        {
+            sec: "Seção 4.3 (p. 93–94)",
+            desc: "Crie uma medida chamada <strong>Total de Horas Paradas</strong> que some todos os valores da coluna <code>OS[Horas Paradas]</code>.",
+            starter: "Total de Horas Paradas = ",
+            solution: "Total de Horas Paradas = SUM(OS[Horas Paradas])",
+            mustContain: ["SUM", "OS[HORAS PARADAS]"],
+            resPlanta: "1.825,21 h",
+            resEq: "93,97 h (BR-01)",
+            resTipo: "Nova Medida"
+        },
+        {
+            sec: "Seção 4.3 (p. 93–94)",
+            desc: "Crie uma medida chamada <strong>Quantidade de OS</strong> que conte o número total de linhas da tabela <code>OS</code>.",
+            starter: "Quantidade de OS = ",
+            solution: "Quantidade de OS = COUNTROWS(OS)",
+            mustContain: ["COUNTROWS", "(OS)"],
+            resPlanta: "350 OS",
+            resEq: "18 OS (BR-01)",
+            resTipo: "Nova Medida"
+        },
+        {
+            sec: "Seções 4.2 e 4.4 (p. 91 e 95)",
+            desc: "Crie a medida <strong>Custo por Hora Parada</strong> dividindo de forma segura (com <code>DIVIDE</code>) a soma de <code>OS[Custo (R$)]</code> pela soma de <code>OS[Horas Paradas]</code>.",
+            starter: "Custo por Hora Parada = ",
+            solution: "Custo por Hora Parada = DIVIDE(SUM(OS[Custo (R$)]), SUM(OS[Horas Paradas]))",
+            mustContain: ["DIVIDE", "SUM", "OS[CUSTO (R$)]", "OS[HORAS PARADAS]"],
+            resPlanta: "R$ 1.017,07 / h",
+            resEq: "R$ 1.109,55 / h (BR-01)",
+            resTipo: "Nova Medida"
+        },
+        {
+            sec: "Seção 4.4 (p. 96)",
+            desc: "Crie uma coluna calculada chamada <strong>Parada Longa</strong> na tabela <code>OS</code> usando <code>IF</code>: se <code>OS[Horas Paradas] >= 8</code>, retorne <code>\"Longa\"</code>, caso contrário <code>\"Normal\"</code>.",
+            starter: "Parada Longa = ",
+            solution: "Parada Longa = IF(OS[Horas Paradas] >= 8, \"Longa\", \"Normal\")",
+            mustContain: ["IF", "OS[HORAS PARADAS]", "8", "LONGA", "NORMAL"],
+            resPlanta: "66 Longas | 284 Normais",
+            resEq: "Valor por linha na OS",
+            resTipo: "Nova Coluna (na tabela OS)"
+        },
+        {
+            sec: "Seção 4.4 (p. 96–97)",
+            desc: "Crie uma coluna calculada <strong>Faixa de Custo</strong> com <code>SWITCH(TRUE(), ...)</code>: até 1000 retorne <code>\"Baixo\"</code>; até 5000 retorne <code>\"Médio\"</code>; acima disso <code>\"Alto\"</code>.",
+            starter: "Faixa de Custo = ",
+            solution: "Faixa de Custo = \nSWITCH(\n    TRUE(),\n    OS[Custo (R$)] <= 1000, \"Baixo\",\n    OS[Custo (R$)] <= 5000, \"Médio\",\n    \"Alto\"\n)",
+            mustContain: ["SWITCH", "TRUE()", "1000", "5000", "BAIXO", "ALTO"],
+            resPlanta: "52 Baixo | 166 Médio | 132 Alto",
+            resEq: "Ordem restritiva (1000 antes de 5000)",
+            resTipo: "Nova Coluna (na tabela OS)"
+        },
+        {
+            sec: "Seção 4.5 (p. 98–99)",
+            desc: "Escreva a medida <strong>Horas Médias por OS</strong> declarando duas variáveis (<code>VAR Horas</code> e <code>VAR Quantidade</code>) e dividindo uma pela outra após o <code>RETURN</code>.",
+            starter: "Horas Médias por OS = \n",
+            solution: "Horas Médias por OS = \nVAR Horas = SUM(OS[Horas Paradas])\nVAR Quantidade = COUNTROWS(OS)\nRETURN\n    DIVIDE(Horas, Quantidade)",
+            mustContain: ["VAR", "RETURN", "DIVIDE", "SUM", "COUNTROWS"],
+            resPlanta: "5,21 h / OS",
+            resEq: "5,22 h / OS (BR-01)",
+            resTipo: "Nova Medida (com VAR)"
+        },
+        {
+            sec: "Seção 4.6 (p. 102)",
+            desc: "Crie uma coluna calculada na tabela <code>OS</code> que busque a coluna <code>Equipamentos[Criticidade]</code> através do relacionamento usando <code>RELATED</code>.",
+            starter: "Criticidade do Equipamento = ",
+            solution: "Criticidade do Equipamento = RELATED(Equipamentos[Criticidade])",
+            mustContain: ["RELATED", "EQUIPAMENTOS[CRITICIDADE]"],
+            resPlanta: "Trazer A, B ou C do Cadastro",
+            resEq: "BR-01 retorna \"A\"",
+            resTipo: "Nova Coluna (na tabela OS)"
+        },
+        {
+            sec: "Seção 4.7 (p. 103–105)",
+            desc: "Crie a medida <strong>Custo de Parada</strong> usando <code>SUMX</code> para percorrer a tabela <code>OS</code> e multiplicar <code>OS[Horas Paradas]</code> por <code>RELATED(Equipamentos[Valor Hora Parada (R$)])</code>.",
+            starter: "Custo de Parada = ",
+            solution: "Custo de Parada = \nSUMX(\n    OS,\n    OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])\n)",
+            mustContain: ["SUMX", "OS", "OS[HORAS PARADAS]", "RELATED", "EQUIPAMENTOS[VALOR HORA PARADA (R$)]"],
+            resPlanta: "R$ 2.126.716,60",
+            resEq: "R$ 173.844,50 (BR-01)",
+            resTipo: "Nova Medida (Iterador)"
+        },
+        {
+            sec: "Seção 4.7 (p. 104)",
+            desc: "Crie a medida <strong>Custo de Parada Médio por OS</strong> usando <code>AVERAGEX</code> com a mesma expressão linha a linha da missão anterior.",
+            starter: "Custo de Parada Médio por OS = ",
+            solution: "Custo de Parada Médio por OS = \nAVERAGEX(\n    OS,\n    OS[Horas Paradas] * RELATED(Equipamentos[Valor Hora Parada (R$)])\n)",
+            mustContain: ["AVERAGEX", "OS", "OS[HORAS PARADAS]", "RELATED", "EQUIPAMENTOS[VALOR HORA PARADA (R$)]"],
+            resPlanta: "R$ 6.076,33 / OS",
+            resEq: "R$ 9.658,03 / OS (BR-01)",
+            resTipo: "Nova Medida (Iterador)"
+        }
+    ];
+
+    function loadMission() {
+        const idx = document.getElementById('missionSelect').value;
+        const m = missions[idx];
+        document.getElementById('missionSecBadge').innerText = m.sec;
+        document.getElementById('missionDesc').innerHTML = m.desc;
+        document.getElementById('daxEditor').value = m.starter;
+        document.getElementById('resPlanta').innerText = m.resPlanta;
+        document.getElementById('resEq').innerText = m.resEq;
+        document.getElementById('resTipo').innerText = m.resTipo;
+        document.getElementById('syntaxMessage').innerHTML = "Monte a fórmula da atividade selecionada e clique em <strong>Verificar Fórmula</strong>.";
+        validateFormula();
+    }
+
+    function insertToken(token) {
+        const editor = document.getElementById('daxEditor');
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const text = editor.value;
+        editor.value = text.substring(0, start) + token + text.substring(end);
+        editor.focus();
+        editor.selectionStart = editor.selectionEnd = start + token.length;
+        validateFormula();
+    }
+
+    function validateFormula() {
+        const code = document.getElementById('daxEditor').value;
+        const openP = (code.match(/\(/g) || []).length;
+        const closeP = (code.match(/\)/g) || []).length;
+        const openB = (code.match(/\[/g) || []).length;
+        const closeB = (code.match(/\]/g) || []).length;
+
+        const counter = document.getElementById('parenCounter');
+        counter.innerText = `Parênteses: ${openP} abertos / ${closeP} fechados | Colchetes: ${openB}/${closeB}`;
+
+        if (openP !== closeP || openB !== closeB) {
+            counter.style.color = "#f87171";
+        } else {
+            counter.style.color = "#a6e3a1";
+        }
+    }
+
+    function checkAnswer() {
+        const idx = document.getElementById('missionSelect').value;
+        const m = missions[idx];
+        const code = document.getElementById('daxEditor').value;
+        const upper = code.toUpperCase();
+        const msgBox = document.getElementById('syntaxMessage');
+
+        const openP = (code.match(/\(/g) || []).length;
+        const closeP = (code.match(/\)/g) || []).length;
+        const openB = (code.match(/\[/g) || []).length;
+        const closeB = (code.match(/\]/g) || []).length;
+
+        if (!code.includes("=")) {
+            msgBox.innerHTML = `<span class="status-err">❌ Atenção (Seção 4.3):</span> Toda medida ou coluna calculada precisa ter o nome seguido do sinal de igual (<code>=</code>).`;
+            return;
+        }
+
+        if (openP !== closeP) {
+            msgBox.innerHTML = `<span class="status-err">❌ Erro de Parênteses (Seção 4.3, p. 93):</span> Você abriu <strong>${openP}</strong> parêntese(s) e fechou <strong>${closeP}</strong>. Todo parêntese aberto precisa ser fechado!`;
+            return;
+        }
+
+        if (openB !== closeB) {
+            msgBox.innerHTML = `<span class="status-err">❌ Erro de Colchetes:</span> Verifique os colchetes <code>[ ]</code> no nome da coluna.`;
+            return;
+        }
+
+        const missing = m.mustContain.filter(item => !upper.includes(item));
+        if (missing.length > 0) {
+            msgBox.innerHTML = `<span class="status-err">⚠️ Quase lá!</span> Sua fórmula ainda não contém os elementos esperados para esta atividade: <code>${missing.join(", ")}</code>.`;
+            return;
+        }
+
+        msgBox.innerHTML = `<span class="status-ok">✅ Sintaxe Perfeita! (${m.sec})</span> Sua fórmula está pronta para ser colada na barra de fórmulas do Power BI Desktop.`;
+    }
+
+    function showSolution() {
+        const idx = document.getElementById('missionSelect').value;
+        document.getElementById('daxEditor').value = missions[idx].solution;
+        validateFormula();
+        checkAnswer();
+    }
+
+    function copyFormula() {
+        const editor = document.getElementById('daxEditor');
+        editor.select();
+        navigator.clipboard.writeText(editor.value);
+        const msgBox = document.getElementById('syntaxMessage');
+        msgBox.innerHTML = `<span class="status-ok">📋 Fórmula copiada para a área de transferência!</span> Agora clique em <strong>Nova medida</strong> (ou <strong>Nova coluna</strong>) no Power BI Desktop e pressione <code>Ctrl+V</code>.`;
+    }
+
+    function clearEditor() {
+        const idx = document.getElementById('missionSelect').value;
+        document.getElementById('daxEditor').value = missions[idx].starter;
+        validateFormula();
+    }
+
+    function filterTable(category, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const rows = document.querySelectorAll('#cheatTable tbody tr');
+        rows.forEach(row => {
+            if (category === 'ALL' || row.getAttribute('data-cat') === category) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function searchTable() {
+        const term = document.getElementById('searchBox').value.toLowerCase();
+        const rows = document.querySelectorAll('#cheatTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(term) ? '' : 'none';
+        });
+    }
+
+    validateFormula();
+</script>
+
+</body>
+</html>
