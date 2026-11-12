@@ -1,8 +1,3 @@
-O planejamento anterior apresentava duas desconexões importantes que foram corrigidas nesta versão:
-1. **Numeração das seções do livro:** As referências antigas citavam capítulos inexistentes (Capítulos 7, 8 e 12 em inglês). O seu livro-texto (*Power BI e DAX para Manutenção*) organiza todos esses temas exatamente no **Capítulo 4 (Seções 4.1 a 4.7)**. Todas as atividades e blocos agora trazem a seção exata da apostila.
-2. **Alinhamento com o Dataset Real anexado:** A base enviada possui **350 ordens de serviço** (`51020` a `51869`) e **20 equipamentos** (`BR-01`, `MO-01`, `FO-01`, `TR-02`, etc.), com as colunas exatas `Custo (R$)`, `Horas Paradas`, `Horas Previstas` e `Valor Hora Parada (R$)`. Todo o laboratório prático e o gabarito de conferência da tarde foram recalculados com os números reais do seu arquivo para que os alunos vejam na tela exatamente os mesmos valores da sua apostila de aula.
-
----
 
 # CRONOGRAMA DE AULA — CAPÍTULO 4: FUNDAMENTOS DA LINGUAGEM DAX
 
