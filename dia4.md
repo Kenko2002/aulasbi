@@ -1,12 +1,4 @@
-Aqui está o texto revisado e corrigido. 
 
-Foram feitos os seguintes ajustes técnicos e de formatação:
-1. **Sintaxe LaTeX/Fórmulas:** O uso de `\mathbf{R\$\, ...}` costuma quebrar em renderizadores como MathJax e KaTeX (devido ao caractere `$` e vírgula decimal dentro do modo matemático). O padrão foi corrigido para `\text{R\$ ...}`.
-2. **Hierarquia de Títulos (Markdown):** A estrutura foi normalizada para iniciar em `#` (H1) e descer organicamente para `##` (H2) e `###` (H3), garantindo conformidade semântica.
-3. **Indentação de Listas:** Alinhamento estrito conforme a especificação CommonMark (recuos padronizados para garantir aninhamento correto de tópicos e citações).
-4. **Padronização de Código e Diagrama:** Formatação consistente de nomes de colunas/tabelas e bloco do diagrama com identificador textual explícito.
-
----
 
 # 08:00 – 08:45 | BLOCO 1: O MOTOR ANALÍTICO DO DAX E O FLUXO DE DADOS DA MANUTENÇÃO
 
